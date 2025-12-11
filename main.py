@@ -1,8 +1,7 @@
-# main.py
 import streamlit as st
-from utils import load_data
+from preprocess import load_data
 
-st.set_page_config(page_title="SSes Survey Dashboard", layout="wide")
+st.set_page_config(page_title="SSES Survey Dashboard", layout="wide")
 
 st.title("SSes Survey Dashboard")
 st.write("Monitoring survey responses in real time.")
@@ -11,7 +10,7 @@ st.write("Monitoring survey responses in real time.")
 df = load_data()
 
 # Show raw data
-st.subheader("📄 Raw Responses")
+st.subheader("Raw Responses")
 st.dataframe(df, use_container_width=True)
 
 # Summary section
