@@ -53,15 +53,11 @@ IMAGE_PATH = BASE_DIR / "assets" / "sses_background.jpg"
 bg_image = get_base64_image(str(IMAGE_PATH))
 set_background(bg_image)
 
-# ======================================
-# DISPLAY LOGO / HEADER IMAGE
-# ======================================
-st.image("assets/sses_background.jpg", width=250, caption="SSES Survey Dashboard")
 
 # ======================================
 # TITLE
 # ======================================
-st.title("📊 SSES Survey Dashboard")
+st.title("SSES Survey Dashboard")
 st.write("Monitoring and analyzing survey responses interactively.")
 
 # ======================================
@@ -73,7 +69,7 @@ df = load_data()
 # SIDEBAR NAVIGATION
 # ======================================
 page = st.sidebar.selectbox(
-    "📂 Navigation",
+    "HOMEPAGE",
     [
         "🏠 Overview",
         "👥 Demographic Analysis",
