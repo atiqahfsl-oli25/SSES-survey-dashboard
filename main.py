@@ -1,29 +1,66 @@
 import streamlit as st
 import plotly.express as px
+import pandas as pd
+import base64
 from sklearn.cluster import KMeans
 from preprocess import load_data
 
-# ----------------------------------
-# Page Configuration
-# ----------------------------------
+# ======================================
+# PAGE CONFIG (MUST BE FIRST)
+# ======================================
 st.set_page_config(
     page_title="SSES Survey Dashboard",
     layout="wide"
 )
 
-st.title("SSES Survey Dashboard")
-st.write("Monitoring survey responses in real time.")
+# ======================================
+# BACKGROUND IMAGE FUNCTIONS
+# ======================================
+def get_base64_image(image_file):
+    with open(image_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
-# ----------------------------------
-# Load Data
-# ----------------------------------
+def set_background(image_base64):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{image_base64}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }}
+        .block-container {{
+            background-color: rgba(255, 255, 255, 0.88);
+            padding: 2rem;
+            border-radius: 14px;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Apply background
+bg_image = get_base64_image("assets/sses_background.png")
+set_background(bg_image)
+
+# ======================================
+# TITLE
+# ======================================
+st.title("📊 SSES Survey Dashboard")
+st.write("Monitoring and analyzing survey responses interactively.")
+
+# ======================================
+# LOAD DATA
+# ======================================
 df = load_data()
 
-# ----------------------------------
-# Sidebar Navigation (Dropdown)
-# ----------------------------------
+# ======================================
+# SIDEBAR NAVIGATION
+# ======================================
 page = st.sidebar.selectbox(
-    "HomePage",
+    "📂 Navigation",
     [
         "🏠 Overview",
         "👥 Demographic Analysis",
@@ -32,9 +69,9 @@ page = st.sidebar.selectbox(
     ]
 )
 
-# ==================================
+# ======================================
 # 🏠 OVERVIEW PAGE
-# ==================================
+# ======================================
 if page == "🏠 Overview":
     st.subheader("📌 Dashboard Overview")
 
@@ -43,22 +80,20 @@ if page == "🏠 Overview":
     col2.metric("Total Variables", len(df.columns))
     col3.metric("Missing Values", df.isna().sum().sum())
 
-    st.markdown("### Survey Data Preview")
+    st.markdown("### 🔍 Data Preview")
     st.dataframe(df, use_container_width=True)
 
-    st.markdown("### Summary Statistics")
+    st.markdown("### 📈 Summary Statistics")
     st.write(df.describe(include="all"))
 
-# ==================================
+# ======================================
 # 👥 DEMOGRAPHIC ANALYSIS PAGE
-# ==================================
+# ======================================
 elif page == "👥 Demographic Analysis":
     st.subheader("👥 Demographic Analysis")
 
-    st.info("Select a demographic variable to explore respondent distribution.")
-
     demo_col = st.selectbox(
-        "Select Demographic Column",
+        "Select Demographic Variable",
         options=df.columns
     )
 
@@ -70,9 +105,9 @@ elif page == "👥 Demographic Analysis":
 
     st.plotly_chart(fig, use_container_width=True)
 
-# ==================================
+# ======================================
 # 📊 SURVEY CHARTS PAGE
-# ==================================
+# ======================================
 elif page == "📊 Survey Charts":
     st.subheader("📊 Survey Question Analysis")
 
@@ -94,15 +129,15 @@ elif page == "📊 Survey Charts":
 
     st.plotly_chart(fig, use_container_width=True)
 
-# ==================================
+# ======================================
 # 🤖 MACHINE LEARNING PAGE
-# ==================================
+# ======================================
 elif page == "🤖 Machine Learning":
-    st.subheader("🤖 Machine Learning: Respondent Segmentation")
+    st.subheader("🤖 Respondent Segmentation (K-Means)")
 
     st.markdown("""
     **Objective:**  
-    Segment respondents based on numeric survey responses using **K-Means clustering**.
+    Group respondents based on numeric survey responses using clustering.
     """)
 
     numeric_df = df.select_dtypes(include=["int64", "float64"])
@@ -110,7 +145,7 @@ elif page == "🤖 Machine Learning":
     if numeric_df.shape[1] < 2:
         st.warning("At least two numeric columns are required for clustering.")
     else:
-        k = st.slider("Select number of clusters (k)", 2, 6, 3)
+        k = st.slider("Number of clusters (k)", 2, 6, 3)
 
         model = KMeans(n_clusters=k, random_state=42)
         clusters = model.fit_predict(numeric_df)
@@ -123,10 +158,10 @@ elif page == "🤖 Machine Learning":
             x=clustered_df.columns[0],
             y=clustered_df.columns[1],
             color="Cluster",
-            title="K-Means Clustering of Survey Respondents"
+            title="Respondent Segmentation"
         )
 
         st.plotly_chart(fig, use_container_width=True)
 
-        st.markdown("### Clustered Data Preview")
+        st.markdown("### 🧠 Clustered Data Preview")
         st.dataframe(clustered_df.head(), use_container_width=True)
