@@ -3,6 +3,7 @@ import plotly.express as px
 import pandas as pd
 import os
 import base64
+from pathlib import Path
 from sklearn.cluster import KMeans
 from preprocess import load_data
 
