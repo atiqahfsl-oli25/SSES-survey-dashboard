@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
+import os
 import base64
 from sklearn.cluster import KMeans
 from preprocess import load_data
