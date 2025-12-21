@@ -30,7 +30,7 @@ def set_background(image_base64):
         f"""
         <style>
         .stApp {{
-            background-image: url("data:image/png;base64,{image_base64}");
+            background-image: url("data:image/jpg;base64,{image_base64}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -47,14 +47,14 @@ def set_background(image_base64):
 
 # Apply background
 BASE_DIR = Path(__file__).resolve().parent
-IMAGE_PATH = BASE_DIR / "assets" / "sses_background.png"
+IMAGE_PATH = BASE_DIR / "assets" / "sses_background.jpg"
 bg_image = get_base64_image(str(IMAGE_PATH))
 set_background(bg_image)
 
 # ======================================
 # DISPLAY LOGO / HEADER IMAGE
 # ======================================
-st.image("assets/sses_background.png", width=250, caption="SSES Survey Dashboard")
+st.image("assets/sses_background.jpg", width=250, caption="SSES Survey Dashboard")
 
 # ======================================
 # TITLE
