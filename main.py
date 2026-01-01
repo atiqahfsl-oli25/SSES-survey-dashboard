@@ -187,6 +187,25 @@ elif page == "🎯 Emotional Resilience Analysis":
     To investigate the relationship between emotional resilience and personal development attributes,
     including motivation, adaptability, emotional control, task persistence, and teamwork skills.
     """)
+
+    # --------------------------------------
+    # Define Objective 3 Variables (FIX)
+    # --------------------------------------
+    objective3_cols = [
+        'calm_under_pressure',
+        'emotional_control',
+        'adaptability',
+        'self_motivation',
+        'task_persistence',
+        'teamwork'
+    ]
+
+    available_cols = [c for c in objective3_cols if c in df.columns]
+
+    if len(available_cols) < 2:
+        st.error("Required variables for Emotional Resilience analysis are missing.")
+        st.stop()
+
 # ======================================
 # 1. Likert Distribution
 # ======================================
