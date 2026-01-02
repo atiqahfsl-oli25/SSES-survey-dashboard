@@ -1,0 +1,9 @@
+# Replace weird dashes and spaces
+df['age'] = (
+    df['age']
+    .astype(str)
+    .str.replace('\u2013', '-', regex=False)   # en dash
+    .str.replace('\u2014', '-', regex=False)   # em dash
+    .str.replace('\xa0', ' ', regex=False)     # non-breaking space
+    .str.strip()
+)
