@@ -12,16 +12,23 @@ st.set_page_config(
     layout="wide"
 )
 
+# ======================================
+# PAGE TITLE & PROBLEM STATEMENT
+# ======================================
 st.title("Emotional Resilience and Personal Development")
 
 st.markdown("""
+**Problem Statement:**  
+Emotional resilience is a key factor in personal and professional success. Understanding how individuals manage stress, adapt to change, control emotions, and maintain motivation can help identify areas for personal development. This analysis investigates the relationship between emotional resilience and key personal development attributes such as adaptability, motivation, emotional control, task persistence, and teamwork skills. Insights from this study aim to inform strategies for enhancing resilience among participants.
+""")
+
+st.markdown("""
 **Objective:**  
-To investigate the relationship between emotional resilience and personal development attributes,
-including motivation, adaptability, emotional control, task persistence, and teamwork skills.
+To investigate the relationship between emotional resilience and personal development attributes, including motivation, adaptability, emotional control, task persistence, and teamwork skills.
 """)
 
 # ======================================
-# LOAD CLEANED DATASET (HAFIZAH VERSION)
+# LOAD CLEANED DATASET
 # ======================================
 DATA_URL = "https://raw.githubusercontent.com/nhusna01/SSES-survey-dashboard/main/Hafizah_SSES_Cleaned.csv"
 df = pd.read_csv(DATA_URL)
@@ -38,7 +45,7 @@ objective3_cols = [
     'teamwork'
 ]
 
-# Ensure numeric (safe check)
+# Ensure numeric and handle missing values
 df[objective3_cols] = df[objective3_cols].apply(pd.to_numeric, errors="coerce")
 df[objective3_cols] = df[objective3_cols].fillna(df[objective3_cols].median())
 
@@ -47,46 +54,20 @@ df[objective3_cols] = df[objective3_cols].fillna(df[objective3_cols].median())
 # ======================================
 st.markdown("### 🧾 Summary Overview")
 
-# Calculate Agree / Disagree proportions
 agree_levels = [4, 5]
 disagree_levels = [1, 2]
 
-agree_prop = (
-    df[objective3_cols]
-    .isin(agree_levels)
-    .mean()
-)
+agree_prop = df[objective3_cols].isin(agree_levels).mean()
+disagree_prop = df[objective3_cols].isin(disagree_levels).mean()
 
-disagree_prop = (
-    df[objective3_cols]
-    .isin(disagree_levels)
-    .mean()
-)
-
-# Identify strongest & weakest attributes
 strongest_attr = agree_prop.idxmax()
 weakest_attr = agree_prop.idxmin()
-
-# Overall resilience index
 overall_resilience = agree_prop.mean()
 
-# Display summary metrics
 col1, col2, col3 = st.columns(3)
-
-col1.metric(
-    "Overall Agreement Level",
-    f"{overall_resilience:.2%}"
-)
-
-col2.metric(
-    "Strongest Attribute",
-    strongest_attr.replace("_", " ").title()
-)
-
-col3.metric(
-    "Lowest Agreement Attribute",
-    weakest_attr.replace("_", " ").title()
-)
+col1.metric("Overall Agreement Level", f"{overall_resilience:.2%}")
+col2.metric("Strongest Attribute", strongest_attr.replace("_", " ").title())
+col3.metric("Lowest Agreement Attribute", weakest_attr.replace("_", " ").title())
 
 # Insight box
 st.markdown(
@@ -113,23 +94,9 @@ st.markdown(
 # ======================================
 st.subheader("1. Distribution of Emotional Resilience and Personal Development Attributes")
 
-# Prepare Likert distribution (same logic as Colab)
-likert_counts = (
-    df[objective3_cols]
-    .apply(lambda x: x.value_counts(normalize=True))
-    .T
-    .reset_index()
-    .rename(columns={"index": "Attribute"})
-)
+likert_counts = df[objective3_cols].apply(lambda x: x.value_counts(normalize=True)).T.reset_index().rename(columns={"index": "Attribute"})
+likert_long = likert_counts.melt(id_vars="Attribute", var_name="Likert Scale", value_name="Proportion")
 
-# Convert to long format
-likert_long = likert_counts.melt(
-    id_vars="Attribute",
-    var_name="Likert Scale",
-    value_name="Proportion"
-)
-
-# Plot stacked bar chart
 fig = px.bar(
     likert_long,
     x="Attribute",
@@ -138,13 +105,7 @@ fig = px.bar(
     barmode="stack",
     title="Distribution of Emotional Resilience and Personal Development Attributes"
 )
-
-fig.update_layout(
-    yaxis_title="Proportion of Responses",
-    xaxis_title="Attributes",
-    legend_title="Likert Scale"
-)
-
+fig.update_layout(yaxis_title="Proportion of Responses", xaxis_title="Attributes", legend_title="Likert Scale")
 st.plotly_chart(fig, use_container_width=True)
 
 # ======================================
@@ -153,21 +114,17 @@ st.plotly_chart(fig, use_container_width=True)
 st.subheader("2. Average Profile of Emotional Resilience")
 
 mean_scores = df[objective3_cols].mean()
-
 fig2 = go.Figure()
-
 fig2.add_trace(go.Scatterpolar(
     r=mean_scores.values.tolist() + [mean_scores.values[0]],
     theta=objective3_cols + [objective3_cols[0]],
     fill='toself'
 ))
-
 fig2.update_layout(
     polar=dict(radialaxis=dict(visible=True, range=[0, 5])),
     showlegend=False,
     title="Average Emotional Resilience and Personal Development Profile"
 )
-
 st.plotly_chart(fig2, use_container_width=True)
 
 # ======================================
@@ -176,14 +133,12 @@ st.plotly_chart(fig2, use_container_width=True)
 st.subheader("3. Correlation Between Emotional Resilience Attributes")
 
 corr_matrix = df[objective3_cols].corr()
-
 fig3 = px.imshow(
     corr_matrix,
     text_auto=".2f",
     color_continuous_scale="RdBu",
     title="Correlation Between Emotional Resilience and Personal Development Attributes"
 )
-
 st.plotly_chart(fig3, use_container_width=True)
 
 # ======================================
@@ -191,18 +146,13 @@ st.plotly_chart(fig3, use_container_width=True)
 # ======================================
 st.subheader("4. Distribution and Variability of Emotional Resilience Attributes")
 
-melted = df[objective3_cols].melt(
-    var_name="Attribute",
-    value_name="Likert Score"
-)
-
+melted = df[objective3_cols].melt(var_name="Attribute", value_name="Likert Score")
 fig4 = px.box(
     melted,
     x="Attribute",
     y="Likert Score",
     title="Distribution and Variability of Emotional Resilience Attributes"
 )
-
 st.plotly_chart(fig4, use_container_width=True)
 
 # ======================================
@@ -212,7 +162,6 @@ st.subheader("5. Comparison by Gender")
 
 if "gender" in df.columns:
     gender_means = df.groupby("gender")[objective3_cols].mean().reset_index()
-
     fig5 = px.bar(
         gender_means,
         x="gender",
@@ -220,7 +169,6 @@ if "gender" in df.columns:
         barmode="group",
         title="Comparison of Emotional Resilience and Personal Development by Gender"
     )
-
     st.plotly_chart(fig5, use_container_width=True)
 else:
     st.info("Gender variable is not available in the dataset.")
