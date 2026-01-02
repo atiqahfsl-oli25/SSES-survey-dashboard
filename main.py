@@ -4,18 +4,33 @@ import os
 import base64
 from pathlib import Path
 from preprocess import load_data
-
-# Import the Emotional Resilience page as a function
 from pages import Emotional_Resilience
 
 # ======================================
-# PAGE CONFIG (MUST BE FIRST)
+# PAGE CONFIG 
 # ======================================
 st.set_page_config(
     page_title="SSES Survey Dashboard",
     page_icon="📊",
     layout="wide"
 )
+
+# Define page
+demographic = st.Page("Demographic_Analysis.py",title="Demographic Analysis")
+machine_learning = st.Page("Machine_Learning.py",title="Machine Learning")
+survey = st.Page("Survey_Charts.py",title="Survey Chart")
+emotion = st.Page("Emotion_Resilience.py",title="Emotion Resilience")
+
+# ======================================
+# NAVIGATION MENU
+# ======================================
+pg = st.navigation(
+    {
+        "Menu": [demographic, machine_learning, survey, emotion]
+    }
+)
+
+pg.run
 
 # ======================================
 # BACKGROUND IMAGE FUNCTIONS
