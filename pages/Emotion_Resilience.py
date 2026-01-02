@@ -63,7 +63,7 @@ df = load_emotion_data()
 # ANALYSIS LOGIC
 # ======================================
 if df is not None:
-    # 1. Define and Clean the Columns
+    # Define and Clean the Columns
     objective3_cols = [
         'calm_under_pressure', 
         'emotional_control', 
@@ -84,7 +84,9 @@ if df is not None:
         df[available_cols] = df[available_cols].apply(pd.to_numeric, errors="coerce")
         df[available_cols] = df[available_cols].fillna(df[available_cols].median())
 
-        # 2. KEY METRICS
+# ======================================
+# KEY METRICS
+# ======================================
         st.subheader("📊 Executive Summary")
         agree_prop = df[available_cols].isin([4, 5]).mean()
         
@@ -93,7 +95,11 @@ if df is not None:
         m2.metric("Top Strength", agree_prop.idxmax().replace('_', ' ').title())
         m3.metric("Growth Area", agree_prop.idxmin().replace('_', ' ').title())
 
-        # 3. RADAR CHART
+# ======================================
+# DATA VISUALIZATION
+# ======================================
+
+        # 1. RADAR CHART
         st.subheader("🕸️ Average Resilience Profile")
         mean_scores = df[available_cols].mean()
         
@@ -112,7 +118,7 @@ if df is not None:
         )
         st.plotly_chart(fig_radar, use_container_width=True)
 
-        # 4. CORRELATION ANALYSIS
+        # 2. CORRELATION ANALYSIS
         st.subheader("🔗 How Attributes Connect")
         st.write("A higher value (red) means those two strengths often appear together in respondents.")
         corr = df[available_cols].corr()
@@ -124,6 +130,14 @@ if df is not None:
             width=800
         )
         st.plotly_chart(fig_corr, use_container_width=True)
-
+        # 3. DISTRIBUTION BOXPLOT
+        st.subheader(" Variability of Attributes")
+        fig_box = px.box(
+            df.melt(value_vars=resilience_cols),
+            x="variable",
+            y="value",
+            color="variable"
+            title="Score Spread per Attribute"
+       )
 else:
     st.warning("Please verify that the GitHub repository 'SSES-survey-dashboard' is set to **Public**.")
