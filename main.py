@@ -19,10 +19,10 @@ st.set_page_config(
 # ======================================
 # Ensure these filenames match your actual files in the directory
 homepage = st.Page("Homepage.py", title="Homepage", icon="🏠", default=True)
-demographic = st.Page("pages/Demographic_Analysis.py", title="Demographic Analysis")
-machine_learning = st.Page("pages/Machine_Learning.py", title="Machine Learning")
-survey = st.Page("pages/Survey_Charts.py", title="Survey Chart")
-emotion = st.Page("pages/Emotion_Resilience.py", title="Emotion Resilience")
+demographic = st.Page("pages/Demographic_Analysis.py", title="Husna")
+machine_learning = st.Page("pages/Machine_Learning.py", title="Adawiyah")
+survey = st.Page("pages/Survey_Charts.py", title="Atiqah")
+emotion = st.Page("pages/Emotion_Resilience.py", title="Hafizah")
 
 pg = st.navigation(
     {
