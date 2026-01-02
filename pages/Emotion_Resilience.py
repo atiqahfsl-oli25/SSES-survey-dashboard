@@ -50,18 +50,8 @@ if df is not None:
     if not available_cols:
         st.error("❌ Required columns not found.")
     else:
+        # Pre-process numeric data
         df[available_cols] = df[available_cols].apply(pd.to_numeric, errors="coerce").fillna(df[available_cols].median())
-
-        # ======================================
-        # 📊 EXECUTIVE SUMMARY
-        # ======================================
-        st.subheader("📊 Executive Summary")
-        agree_prop = df[available_cols].isin([4, 5]).mean()
-        
-        m1, m2, m3 = st.columns(3)
-        m1.metric("Overall Agreement", f"{agree_prop.mean():.1%}")
-        m2.metric("Top Strength", agree_prop.idxmax().replace('_', ' ').title())
-        m3.metric("Growth Area", agree_prop.idxmin().replace('_', ' ').title())
 
         # ======================================
         # 1. RADAR CHART
@@ -77,7 +67,6 @@ if df is not None:
         st.plotly_chart(fig_radar, use_container_width=True)
         
         st.markdown(f"**💡 Insight:** Core group strength is **{mean_scores.idxmax().replace('_',' ').title()}**.")
-        st.write("**Interpretation:** The group shows strong collaborative skills, but the inward pull in some areas suggests stress management is a relative vulnerability.")
 
         # ======================================
         # 2. CORRELATION ANALYSIS
@@ -91,8 +80,6 @@ if df is not None:
         high_corr = corr.unstack().sort_values(ascending=False).drop_duplicates()
         st.table(pd.DataFrame(high_corr[high_corr < 1].head(3), columns=['Correlation Strength']))
 
-        st.write("**Interpretation:** Strong correlations (e.g., Emotional Control & Adaptability) prove that internal emotional regulation is the primary driver for situational flexibility.")
-
         # ======================================
         # 3. VIOLIN PLOT (DENSITY)
         # ======================================
@@ -101,33 +88,37 @@ if df is not None:
         fig_violin = px.violin(df_melted, x="Attribute", y="Score", color="Attribute", box=True, points="all")
         st.plotly_chart(fig_violin, use_container_width=True)
         
-        st.markdown("**💡 Insight:** The distribution shape indicates how consistent the group is.")
-        st.write("**Interpretation:** A wide violin 'belly' indicates a strong consensus in scores, while a thin, long violin suggests that some individuals are outliers in their resilience levels.")
+        st.write("**Interpretation:** The width of the violin represents the frequency of scores. ")
 
         # ======================================
-        # 4. DIVERGING SENTIMENT BAR
+        # 4. SENTIMENT ANALYSIS (DIVERGING BAR) - FIXED SECTION
         # ======================================
         st.subheader("4. Sentiment Analysis (Agreement vs Disagreement)")
-        def get_sentiment(col):
-            counts = df[col].value_counts(normalize=True).reindex([1,2,3,4,5], fill_value=0)
+        
+        def get_sentiment(series):
+            # series is already the column data because of .apply()
+            counts = series.value_counts(normalize=True).reindex([1,2,3,4,5], fill_value=0)
             disagree = -(counts[1] + counts[2]) * 100
             neutral = counts[3] * 100
             agree = (counts[4] + counts[5]) * 100
             return pd.Series([disagree, neutral, agree], index=['Disagree', 'Neutral', 'Agree'])
 
+        # Apply to the dataframe and transpose
         sentiment_df = df[available_cols].apply(get_sentiment).T.reset_index()
-        fig_sent = px.bar(sentiment_df, x=['Disagree', 'Neutral', 'Agree'], y='index', 
+        sentiment_df.columns = ['Attribute', 'Disagree', 'Neutral', 'Agree']
+
+        fig_sent = px.bar(sentiment_df, x=['Disagree', 'Neutral', 'Agree'], y='Attribute', 
                           orientation='h', barmode='relative',
-                          color_discrete_map={'Disagree': '#EF553B', 'Neutral': '#FECB52', 'Agree': '#00CC96'})
+                          color_discrete_map={'Disagree': '#EF553B', 'Neutral': '#FECB52', 'Agree': '#00CC96'},
+                          title="Diverging Likert Scale (Sentiment)")
+        
         st.plotly_chart(fig_sent, use_container_width=True)
-
-        st.markdown("**📌 Key Finding: Sentiment Split**")
-        st.dataframe(sentiment_df.rename(columns={'index': 'Attribute'}))
-
-        st.write("**Interpretation:** Attributes with larger red bars represent critical development gaps where respondents feel they lack resilience or control.")
+        
+        st.markdown("**📌 Key Finding: Sentiment Data**")
+        st.dataframe(sentiment_df)
 
         # ======================================
-        # 5. ATTRIBUTE HIERARCHY (Treemap)
+        # 5. ATTRIBUTE HIERARCHY
         # ======================================
         st.subheader("5. Attribute Hierarchy Ranking")
         tree_data = pd.DataFrame({
@@ -137,8 +128,6 @@ if df is not None:
         fig_tree = px.treemap(tree_data, path=['Attribute'], values='Mean Score',
                               color='Mean Score', color_continuous_scale='Blues')
         st.plotly_chart(fig_tree, use_container_width=True)
-        
-        st.write(f"**Interpretation:** This hierarchy identifies **{tree_data.iloc[0]['Attribute']}** as the primary pillar supporting the group's personal development.")
 
         # ======================================
         # 6. BOXPLOT (VARIABILITY)
@@ -147,9 +136,6 @@ if df is not None:
         fig_box = px.box(df_melted, x="Attribute", y="Score", color="Attribute")
         st.plotly_chart(fig_box, use_container_width=True)
         
-        st.markdown("**💡 Insight:** Outliers and box height represent group consistency.")
-        st.write("**Interpretation:** A compact box indicates a unified experience, while large ranges suggest that development strategies should be tailored to individual needs.")
-
         # ======================================
         # CONCLUSION
         # ======================================
@@ -158,10 +144,11 @@ if df is not None:
         
         st.success(f"""
         **Final Synthesis:**
-        The investigation reveals a high level of collaborative resilience, but highlights specific gaps in internal stress management. 
-        1. **Core Success:** The high Mean Score in **{tree_data.iloc[0]['Attribute']}** shows a strong foundation for teamwork.
-        2. **Actionable Link:** Improving **{available_cols[1].replace('_',' ')}** is likely to yield the highest ROI for overall resilience due to its strong correlation with other traits.
-        3. **Recommendation:** Personal development programs should shift focus toward the 'Growth Area' of **{tree_data.iloc[-1]['Attribute']}** to create a more well-rounded resilience profile.
+        The investigation highlights that while the group is strong in **{tree_data.iloc[0]['Attribute']}**, 
+        developmental focus is needed in **{tree_data.iloc[-1]['Attribute']}**. 
+        
+        The correlation data suggests that emotional regulation is a "keystone" skill—improving it will likely improve all other resilience factors simultaneously.
         """)
+
 else:
     st.warning("Please verify that the GitHub repository 'SSES-survey-dashboard' is set to **Public**.")
