@@ -12,8 +12,8 @@ def app():
 
     st.markdown("""
     **Problem Statement:**
-    st.write("Emotional resilience is a key factor in personal and professional success. Understanding how individuals manage stress, adapt to change, control emotions, and maintain motivation can help identify areas for personal development. This analysis investigates the relationship between emotional resilience and key personal development attributes such as adaptability, motivation, emotional control, task persistence, and teamwork skills. Insights from this study aim to inform strategies for enhancing resilience among participants.
-    ")
+    Emotional resilience is a key factor in personal and professional success. Understanding how individuals manage stress, adapt to change, control emotions, and maintain motivation can help identify areas for personal development. This analysis investigates the relationship between emotional resilience and key personal development attributes such as adaptability, motivation, emotional control, task persistence, and teamwork skills. Insights from this study aim to inform strategies for enhancing resilience among participants.
+    """)
 
     st.markdown("""
     **Objective:**  
