@@ -15,7 +15,7 @@ including **adaptability, motivation, and teamwork**.
 """)
 
 # ======================================
-# DATA LOADING (USING YOUR RAW URL)
+# DATA LOADING 
 # ======================================
 # This URL points directly to the CSV content
 DATA_URL = "https://raw.githubusercontent.com/nhusna01/SSES-survey-dashboard/main/dataset/Hafizah_SSES_Cleaned.csv"
@@ -95,7 +95,8 @@ if df is not None:
             corr, 
             text_auto=".2f", 
             color_continuous_scale="RdBu_r",
-            aspect="auto"
+            height=600,
+            width=800
         )
         st.plotly_chart(fig_corr, use_container_width=True)
 
